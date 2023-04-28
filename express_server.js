@@ -30,6 +30,7 @@ app.get("/fetch", (req, res) => {
   res.send(`a = ${a}`);
 });
 
+// urls_index.ejs template
 app.get("/urls", (req, res) => {
   const templateVars = { urls: urlDatabase };
   res.render("urls_index", templateVars);
