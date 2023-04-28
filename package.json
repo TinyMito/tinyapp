@@ -16,5 +16,8 @@
   "bugs": {
     "url": "https://github.com/TinyMito/tinyapp/issues"
   },
-  "homepage": "https://github.com/TinyMito/tinyapp#readme"
+  "homepage": "https://github.com/TinyMito/tinyapp#readme",
+  "dependencies": {
+    "express": "^4.18.2"
+  }
 }
