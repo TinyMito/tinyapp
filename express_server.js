@@ -5,13 +5,20 @@ const PORT = 8080; // default port 8080
 app.set("view engine", "ejs");
 app.use(express.urlencoded({ extended: true }));
 
-function generateRandomString(charNum) {
+const generateRandomString = (charNum) => {
   const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
   let result = '';
   for (let i = 0; i < charNum; i++) {
     result += characters.charAt(Math.floor(Math.random() * characters.length));
   }
   return result;
+};
+
+const checkHttp = (url) => {
+  if (!url.startsWith("https://") && !url.startsWith("http://")) {
+    return "https://" + url;
+  } 
+  return url;
 }
 
 const urlDatabase = {
@@ -62,25 +69,17 @@ app.get("/u/:id", (req, res) => {
 
 // Create new key for new URL
 app.post("/urls", (req, res) => {
-  const key = generateRandomString(6); // Call function to generate random 6 characters
+  const id = generateRandomString(6); // Call function to generate random 6 characters
   let url = req.body.longURL;
-  if (!url.startsWith("https://") && !url.startsWith("http://")) {
-    urlDatabase[key] = "https://" + url;
-  } else {
-    urlDatabase[key] = url; // Add to urlDatabase but will reset if the server restarted
-  }
-  res.redirect(`/urls/${key}`);
+  urlDatabase[id] = checkHttp(url);
+  res.redirect(`/urls/${id}`);
 });
 
 // Update existing URL
 app.post("/urls/:id", (req, res) => {
   const id = req.params.id;
   let url = req.body.longURL;
-  if (!url.startsWith("https://") && !url.startsWith("http://")) {
-    urlDatabase[id] = "https://" + url;
-  } else {
-    urlDatabase[id] = url;
-  }
+  urlDatabase[id] = checkHttp(url);
   res.redirect(`/urls/`);
 });
 
