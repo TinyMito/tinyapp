@@ -29,6 +29,8 @@ const urlDatabase = {
   "9sm5xK": "http://www.google.com"
 };
 
+/* Initial Setup for Testing
+ */
 app.get("/", (req, res) => {
   res.send("Hello!");
 });
@@ -50,8 +52,7 @@ app.get("/fetch", (req, res) => {
   res.send(`a = ${a}`);
 });
 
-/* EJS template
- * 
+/* Pass variables to EJS template
  */
 app.get("/urls", (req, res) => {
   const templateVars = { 
@@ -82,10 +83,9 @@ app.get("/u/:id", (req, res) => {
   res.redirect(longURL);
 });
 
-/* EJS template
- * 
- */
 
+/* POST
+ */
 // Create new key for new URL
 app.post("/urls", (req, res) => {
   const id = generateRandomString(6); // Call function to generate random 6 characters
@@ -117,7 +117,6 @@ app.post("/login", (req, res) => {
 
 // Logout and clear cookies
 app.post("/logout", (req, res) => {
-  const userName = req.body.username;
   res.clearCookie("username");
   res.redirect("/urls");
 })
