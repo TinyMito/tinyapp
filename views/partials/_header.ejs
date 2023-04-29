@@ -18,15 +18,23 @@
         <a class="nav-item nav-link" href="/urls/new">Create New URL</a>
       </div>
       <div class="ml-auto">
-        <form class="form-inline" action="/login" method="POST">
-          <input
-            name="username"
-            placeholder="Username"
-            class="form-control"
-            style="margin: 0 1em;"
-          />
-          <button type="submit" class="btn btn-outline-light">Login</button>
-        </form>
+        <% if (username) { %>
+          <form class="form-inline" action="/logout" method="POST">
+            <label  style="margin: 0 1em;" for="username">Welcome <%= username %></label>
+            <button type="submit" class="btn btn-outline-light">Logout</button>
+          </form>        
+        <% } else { %>
+          <form class="form-inline" action="/login" method="POST">
+            <label for="username"></label>
+            <input
+              name="username"
+              placeholder="Username"
+              class="form-control"
+              style="margin: 0 1em;"
+            />
+            <button type="submit" class="btn btn-outline-light">Login</button>
+          </form>
+        <% } %>
       </div>
     </div>
   </nav>
