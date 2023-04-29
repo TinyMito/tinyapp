@@ -25,12 +25,12 @@
         <h5 class="card-title">Edit</h5>
         <form class="form-inline" action="/urls/<%= id %>" method="POST">
           <div class="form-group mb-2" style="margin: 0 auto;">
-            <label for="longURL">New URL:</label>
+            <label for="longURL">Edit URL:</label>
             <input
               class="form-control"
               type="text"
               name="longURL"
-              placeholder="http://"
+              placeholder="<%= longURL %>"
               style="width: 300px; margin: 1em"
             />
             <button type="submit" class="btn btn-primary">Submit</button>
