@@ -80,7 +80,7 @@ app.post("/urls/:id", (req, res) => {
   const id = req.params.id;
   const url = req.body.longURL;
   urlDatabase[id] = checkHttp(url);
-  res.redirect(`/urls/`);
+  res.redirect("/urls/");
 });
 
 // Delete URL
@@ -88,6 +88,13 @@ app.post("/urls/:id/delete", (req, res) => {
   delete urlDatabase[req.params.id];
   res.redirect("/urls");
 });
+
+// Login and set cookies
+app.post("/login", (req, res) => {
+  const userName = req.body.username;
+  res.cookie("username", userName);
+  res.redirect("/urls");
+})
 
 app.listen(PORT, () => {
   console.log(`TinyApp app listening on port ${PORT}!`);
