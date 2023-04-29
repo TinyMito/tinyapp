@@ -50,7 +50,9 @@ app.get("/fetch", (req, res) => {
   res.send(`a = ${a}`);
 });
 
-// urls_index.ejs template
+/* EJS template
+ * 
+ */
 app.get("/urls", (req, res) => {
   const templateVars = { 
     username: req.cookies.username,
@@ -79,6 +81,10 @@ app.get("/u/:id", (req, res) => {
   const longURL = urlDatabase[req.params.id];
   res.redirect(longURL);
 });
+
+/* EJS template
+ * 
+ */
 
 // Create new key for new URL
 app.post("/urls", (req, res) => {
