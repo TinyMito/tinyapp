@@ -61,12 +61,12 @@ app.get("/u/:id", (req, res) => {
 });
 
 app.post("/urls", (req, res) => {
-  const key = generateRandomString(6);
+  const key = generateRandomString(6); // Call function to generate random 6 characters
   const url = req.body.longURL;
-  urlDatabase[key] = url;
+  urlDatabase[key] = url; // Add to urlDatabase but will reset if the server restarted
   res.redirect(`/urls/${key}`);
 });
 
 app.listen(PORT, () => {
-  console.log(`Example app listening on port ${PORT}!`);
+  console.log(`TinyApp app listening on port ${PORT}!`);
 });
