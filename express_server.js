@@ -67,6 +67,13 @@ app.post("/urls", (req, res) => {
   res.redirect(`/urls/${key}`);
 });
 
+app.post("/urls/:id", (req, res) => {
+  const id = req.params.id;
+  const url = req.body.longURL;
+  urlDatabase[id] = url; // Add to urlDatabase but will reset if the server restarted
+  res.redirect(`/urls/${id}`);
+});
+
 app.post("/urls/:id/delete", (req, res) => {
   delete urlDatabase[req.params.id];
   res.redirect("/urls");
