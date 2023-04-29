@@ -50,7 +50,7 @@ app.get("/urls/new", (req, res) => {
   res.render("urls_new");
 });
 
-app.get("/urls/:id", (req, res) => {
+app.get("/u/:id", (req, res) => {
   const templateVars = { id: req.params.id, longURL: urlDatabase[req.params.id] };
   res.render("urls_show", templateVars);
 });
@@ -59,7 +59,7 @@ app.post("/urls", (req, res) => {
   const key = generateRandomString(6);
   const url = req.body.longURL;
   urlDatabase[key] = url;
-  res.redirect(`/urls/${key}`);
+  res.redirect(`/u/${key}`);
 });
 
 app.listen(PORT, () => {
