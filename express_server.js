@@ -1,9 +1,12 @@
 const express = require("express");
+const cookieParser = require('cookie-parser')
 const app = express();
 const PORT = 8080; // default port 8080
 
-app.set("view engine", "ejs");
+app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
+app.set("view engine", "ejs");
+
 
 const generateRandomString = (charNum) => {
   const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
@@ -50,7 +53,7 @@ app.get("/fetch", (req, res) => {
 // urls_index.ejs template
 app.get("/urls", (req, res) => {
   const templateVars = { 
-    username: req.cookies["username"],
+    username: req.cookies.username,
     urls: urlDatabase 
   };
   res.render("urls_index", templateVars);
