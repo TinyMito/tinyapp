@@ -63,16 +63,24 @@ app.get("/u/:id", (req, res) => {
 // Create new key for new URL
 app.post("/urls", (req, res) => {
   const key = generateRandomString(6); // Call function to generate random 6 characters
-  const url = req.body.longURL;
-  urlDatabase[key] = url; // Add to urlDatabase but will reset if the server restarted
+  let url = req.body.longURL;
+  if (!url.startsWith("https://") && !url.startsWith("http://")) {
+    urlDatabase[key] = "https://" + url;
+  } else {
+    urlDatabase[key] = url; // Add to urlDatabase but will reset if the server restarted
+  }
   res.redirect(`/urls/${key}`);
 });
 
 // Update existing URL
 app.post("/urls/:id", (req, res) => {
   const id = req.params.id;
-  const url = req.body.longURL;
-  urlDatabase[id] = url;
+  let url = req.body.longURL;
+  if (!url.startsWith("https://") && !url.startsWith("http://")) {
+    urlDatabase[id] = "https://" + url;
+  } else {
+    urlDatabase[id] = url;
+  }
   res.redirect(`/urls/`);
 });
 
