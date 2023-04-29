@@ -70,7 +70,7 @@ app.get("/u/:id", (req, res) => {
 // Create new key for new URL
 app.post("/urls", (req, res) => {
   const id = generateRandomString(6); // Call function to generate random 6 characters
-  let url = req.body.longURL;
+  const url = req.body.longURL;
   urlDatabase[id] = checkHttp(url);
   res.redirect(`/urls/${id}`);
 });
@@ -78,7 +78,7 @@ app.post("/urls", (req, res) => {
 // Update existing URL
 app.post("/urls/:id", (req, res) => {
   const id = req.params.id;
-  let url = req.body.longURL;
+  const url = req.body.longURL;
   urlDatabase[id] = checkHttp(url);
   res.redirect(`/urls/`);
 });
