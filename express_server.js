@@ -60,6 +60,7 @@ app.get("/u/:id", (req, res) => {
   res.redirect(longURL);
 });
 
+// Create new key for new URL
 app.post("/urls", (req, res) => {
   const key = generateRandomString(6); // Call function to generate random 6 characters
   const url = req.body.longURL;
@@ -67,13 +68,15 @@ app.post("/urls", (req, res) => {
   res.redirect(`/urls/${key}`);
 });
 
+// Update existing URL
 app.post("/urls/:id", (req, res) => {
   const id = req.params.id;
   const url = req.body.longURL;
-  urlDatabase[id] = url; // Add to urlDatabase but will reset if the server restarted
+  urlDatabase[id] = url;
   res.redirect(`/urls/${id}`);
 });
 
+// Delete URL
 app.post("/urls/:id/delete", (req, res) => {
   delete urlDatabase[req.params.id];
   res.redirect("/urls");
