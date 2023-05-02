@@ -66,6 +66,14 @@ app.get("/register", (req, res) => {
   res.render("urls_register", templateVars);
 });
 
+app.get("/login", (req, res) => {
+  const templateVars = {
+    cookieId: req.cookies.user_id,
+    user: users[req.cookies.user_id]
+  };
+  res.render("urls_login", templateVars);
+});
+
 app.get("/urls/new", (req, res) => {
   const templateVars = {
     cookieId: req.cookies.user_id,
@@ -114,7 +122,7 @@ app.post("/urls/:id/delete", (req, res) => {
   res.redirect("/urls");
 });
 
-// New User Registration
+// Register
 app.post("/register", (req, res) => {
   const id = generateRandomString(6);
   const email = req.body.email;
@@ -136,7 +144,7 @@ app.post("/register", (req, res) => {
   }
 });
 
-// Login and set cookies
+// Login
 app.post("/login", (req, res) => {
   const username = req.body.username;
   if (!(username in users)) {
@@ -147,7 +155,7 @@ app.post("/login", (req, res) => {
   }
 });
 
-// Logout and clear cookies
+// Logout
 app.post("/logout", (req, res) => {
   res.clearCookie("user_id");
   res.redirect("/urls");
