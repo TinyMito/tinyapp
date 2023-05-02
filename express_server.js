@@ -32,7 +32,8 @@ const urlDatabase = {
 /* Initial Setup for Testing
  */
 app.get("/", (req, res) => {
-  res.send("Hello!");
+  //res.send("Hello!");
+  res.redirect("/urls");
 });
 
 app.get("/urls.json", (req, res) => {
