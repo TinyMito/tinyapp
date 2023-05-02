@@ -135,6 +135,9 @@ app.post("/register", (req, res) => {
 
   if (!email || !password) {
     res.status(400).send('Please enter email and password!');
+  } else if (Object.values(users).find(user => user.email === email)) {
+    res.status(400).send('Email already exist!');
+    console.log(Object.values(users))
   } else {
     users[id] = {
       id,
