@@ -144,14 +144,14 @@ app.post("/register", (req, res) => {
 
 // Login and set cookies
 app.post("/login", (req, res) => {
-  const userName = req.body.username;
-  res.cookie("username", userName);
+  const username = req.body.username;
+  res.cookie("user_id", username);
   res.redirect("/urls");
 });
 
 // Logout and clear cookies
 app.post("/logout", (req, res) => {
-  res.clearCookie("username");
+  res.clearCookie("user_id");
   res.redirect("/urls");
 });
 
