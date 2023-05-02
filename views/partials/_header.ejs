@@ -18,7 +18,7 @@
         <a class="nav-item nav-link" href="/urls/new">Create New URL</a>
       </div>
       <div class="ml-auto">
-        <% if (user_id) { %>
+        <% if (cookieId) { %>
           <form class="form-inline" action="/logout" method="POST">
             <label  style="margin: 0 1em;" for="username">Welcome <%= user.email %>!</label>
             <button type="submit" class="btn btn-outline-light">Logout</button>

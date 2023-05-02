@@ -64,17 +64,16 @@ app.get("/fetch", (req, res) => {
  */
 app.get("/urls", (req, res) => {
   const templateVars = {
-    user_id: req.cookies.user_id,
+    cookieId: req.cookies.user_id,
     user: users[req.cookies.user_id],
     urls: urlDatabase
   };
-  console.log(templateVars)
   res.render("urls_index", templateVars);
 });
 
 app.get("/register", (req, res) => {
   const templateVars = {
-    user_id: req.cookies.user_id,
+    cookieId: req.cookies.user_id,
     user: users[req.cookies.user_id]
   };
   res.render("urls_register", templateVars);
@@ -82,7 +81,7 @@ app.get("/register", (req, res) => {
 
 app.get("/urls/new", (req, res) => {
   const templateVars = {
-    user_id: req.cookies.user_id,
+    cookieId: req.cookies.user_id,
     user: users[req.cookies.user_id]
   };
   res.render("urls_new", templateVars);
@@ -90,7 +89,7 @@ app.get("/urls/new", (req, res) => {
 
 app.get("/urls/:id", (req, res) => {
   const templateVars = {
-    user_id: req.cookies.user_id,
+    cookieId: req.cookies.user_id,
     user: users[req.cookies.user_id],
     id: req.params.id,
     longURL: urlDatabase[req.params.id]
@@ -134,24 +133,28 @@ app.post("/register", (req, res) => {
   const email = req.body.email;
   const password = req.body.password;
 
-  users[id] = {
-    id,
-    email,
-    password
-  };
-
-  // Login immediately
-  res.cookie("user_id", id);
-
-  console.log(users);
-  res.redirect("/urls");
+  if (!email || !password) {
+    res.status(400).send('Please enter email and password!');
+  } else {
+    users[id] = {
+      id,
+      email,
+      password
+    };
+    res.cookie("user_id", id);
+    res.redirect("/urls");
+  }
 });
 
 // Login and set cookies
 app.post("/login", (req, res) => {
   const username = req.body.username;
-  res.cookie("user_id", username);
-  res.redirect("/urls");
+  if (!(username in users)) {
+    res.status(400).send('User does not exist');
+  } else {
+    res.cookie("user_id", username);
+    res.redirect("/urls");
+  }
 });
 
 // Logout and clear cookies
