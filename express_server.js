@@ -30,9 +30,9 @@ const urlDatabase = {
 };
 
 const users = {
-  uMeaoKA: {
-    id:       "uMeaoKA",
-    email:    "my@email.com",
+  MeaoKA: {
+    id:       "MeaoKA",
+    email:    "MeaoKA@example.com",
     password: "my-password"
   }
 };
@@ -64,29 +64,34 @@ app.get("/fetch", (req, res) => {
  */
 app.get("/urls", (req, res) => {
   const templateVars = {
-    username: req.cookies.username,
+    user_id: req.cookies.user_id,
+    user: users[req.cookies.user_id],
     urls: urlDatabase
   };
+  console.log(templateVars)
   res.render("urls_index", templateVars);
 });
 
 app.get("/register", (req, res) => {
   const templateVars = {
-    username: req.cookies.username,
+    user_id: req.cookies.user_id,
+    user: users[req.cookies.user_id]
   };
   res.render("urls_register", templateVars);
 });
 
 app.get("/urls/new", (req, res) => {
   const templateVars = {
-    username: req.cookies.username,
+    user_id: req.cookies.user_id,
+    user: users[req.cookies.user_id]
   };
   res.render("urls_new", templateVars);
 });
 
 app.get("/urls/:id", (req, res) => {
   const templateVars = {
-    username: req.cookies.username,
+    user_id: req.cookies.user_id,
+    user: users[req.cookies.user_id],
     id: req.params.id,
     longURL: urlDatabase[req.params.id]
   };
@@ -129,8 +134,8 @@ app.post("/register", (req, res) => {
   const email = req.body.email;
   const password = req.body.password;
 
-  users['u' + id] = {
-    id: 'u' + id,
+  users[id] = {
+    id,
     email,
     password
   };

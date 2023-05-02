@@ -20,7 +20,7 @@
       <div class="ml-auto">
         <% if (user_id) { %>
           <form class="form-inline" action="/logout" method="POST">
-            <label  style="margin: 0 1em;" for="username">Welcome <%= user_id %>!</label>
+            <label  style="margin: 0 1em;" for="username">Welcome <%= user.email %>!</label>
             <button type="submit" class="btn btn-outline-light">Logout</button>
           </form>        
         <% } else { %>
