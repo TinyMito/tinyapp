@@ -7,7 +7,14 @@ app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
 app.set("view engine", "ejs");
 
+// Define App Messages
+const emailBlank = 'Please enter your email.';
+const emailConflict = 'Email already exist!';
+const emailNotFound = 'Email does not exist.';
+const passBlank = 'Please enter a password.';
+const passError = 'Password is incorrect.';
 
+// Generate Random String
 const generateRandomString = (charNum) => {
   const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
   let result = '';
@@ -17,6 +24,7 @@ const generateRandomString = (charNum) => {
   return result;
 };
 
+// Check Input URL to includes HTTPS://
 const checkHttp = (url) => {
   if (!url.startsWith("https://") && !url.startsWith("http://")) {
     return "https://" + url;
@@ -24,6 +32,8 @@ const checkHttp = (url) => {
   return url;
 };
 
+/* Databases
+ */
 const urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
   "9sm5xK": "http://www.google.com"
@@ -37,13 +47,15 @@ const users = {
   }
 };
 
-/* Initial Setup for Testing
+/* Redirect localhost to /urls page.
  */
 app.get("/", (req, res) => {
   res.redirect("/urls/");
 });
 
-app.get("/data", (req, res) => {
+/* Display Test Data
+ */
+app.get("/data.json", (req, res) => {
   const data = {
     urlDatabase,
     users
@@ -52,7 +64,8 @@ app.get("/data", (req, res) => {
   res.send(JSON.stringify(data, null, 2));
 });
 
-/* Pass variables to EJS template
+/* GET
+ * Pass variables to EJS template
  */
 app.get("/urls", (req, res) => {
   const templateVars = {
@@ -104,6 +117,7 @@ app.get("/u/:id", (req, res) => {
 
 
 /* POST
+ * Request Submitted Data
  */
 // Create new key for new URL
 app.post("/urls", (req, res) => {
@@ -134,13 +148,13 @@ app.post("/register", (req, res) => {
   const password = req.body.password;
 
   if (!email) {
-    res.status(400).send('Please enter your email.');
+    res.status(400).send(emailBlank);
   } else if (!password) {
-    res.status(400).send('Please enter a password.');
+    res.status(400).send(passBlank);
   } else {
     for (const user in users) {
       if (email === users[user].email) {
-        res.status(400).send('Email already exist!');
+        res.status(400).send(emailConflict);
       } else {
         users[id] = {
           id,
@@ -160,9 +174,9 @@ app.post("/login", (req, res) => {
   const password = req.body.password;
 
   if (!email) {
-    res.status(400).send('Please enter your email.');
+    res.status(400).send(emailBlank);
   } else if (!password) {
-    res.status(400).send('Please enter a password.');
+    res.status(400).send(passBlank);
   } else {
     for (const user in users) {
       if (email === users[user].email) {
@@ -170,10 +184,10 @@ app.post("/login", (req, res) => {
           res.cookie("user_id", users[user].id);
           res.redirect("/urls");
         } else {
-          res.status(403).send('Password is incorrect.');
+          res.status(403).send(passError);
         }
       } else {
-        res.status(403).send('Email does not exist.');
+        res.status(403).send(emailNotFound);
       }
     }
   }
@@ -185,6 +199,7 @@ app.post("/logout", (req, res) => {
   res.redirect("/login");
 });
 
+// Server Status
 app.listen(PORT, () => {
   console.log(`TinyApp app listening on port ${PORT}!`);
 });
