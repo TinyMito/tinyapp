@@ -30,9 +30,9 @@ const urlDatabase = {
 };
 
 const users = {
-  MeaoKA: {
-    id:       "MeaoKA",
-    email:    "MeaoKA@example.com",
+  test: {
+    id:       "test",
+    email:    "test@example.com",
     password: "my-password"
   }
 };
@@ -43,8 +43,13 @@ app.get("/", (req, res) => {
   res.redirect("/urls/");
 });
 
-app.get("/urls.json", (req, res) => {
-  res.json(urlDatabase);
+app.get("/data", (req, res) => {
+  const data = {
+    urlDatabase,
+    users
+  };
+  res.set("Content-Type", "application/json");
+  res.send(JSON.stringify(data, null, 2));
 });
 
 /* Pass variables to EJS template
@@ -128,30 +133,49 @@ app.post("/register", (req, res) => {
   const email = req.body.email;
   const password = req.body.password;
 
-  if (!email || !password) {
-    res.status(400).send('Please enter email and password!');
-  } else if (Object.values(users).find(user => user.email === email)) {
-    res.status(400).send('Email already exist!');
-    console.log(Object.values(users))
+  if (!email) {
+    res.status(400).send('Please enter your email.');
+  } else if (!password) {
+    res.status(400).send('Please enter a password.');
   } else {
-    users[id] = {
-      id,
-      email,
-      password
-    };
-    res.cookie("user_id", id);
-    res.redirect("/urls");
+    for (const user in users) {
+      if (email === users[user].email) {
+        res.status(400).send('Email already exist!');
+      } else {
+        users[id] = {
+          id,
+          email,
+          password
+        };
+        res.cookie("user_id", users[user].id);
+        res.redirect("/urls");
+      }
+    }
   }
 });
 
 // Login
 app.post("/login", (req, res) => {
-  const username = req.body.username;
-  if (!(username in users)) {
-    res.status(400).send('User does not exist');
+  const email = req.body.email;
+  const password = req.body.password;
+
+  if (!email) {
+    res.status(400).send('Please enter your email.');
+  } else if (!password) {
+    res.status(400).send('Please enter a password.');
   } else {
-    res.cookie("user_id", username);
-    res.redirect("/urls");
+    for (const user in users) {
+      if (email === users[user].email) {
+        if (password === users[user].password) {
+          res.cookie("user_id", users[user].id);
+          res.redirect("/urls");
+        } else {
+          res.status(403).send('Password is incorrect.');
+        }
+      } else {
+        res.status(403).send('Email does not exist.');
+      }
+    }
   }
 });
 
