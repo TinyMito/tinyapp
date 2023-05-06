@@ -32,6 +32,7 @@ const emailConflict = 'Email already exist!';
 const emailNotFound = 'Email does not exist.';
 const passBlank = 'Please enter a password.';
 const passError = 'Password is incorrect.';
+const url404 = 'URL Not Found Invalid ID.';
 
 // Generate Random String
 const generateRandomString = (charNum) => {
@@ -43,8 +44,9 @@ const generateRandomString = (charNum) => {
   return result;
 };
 
-// Check for existing user and set cookieID
+// Define a variable cookieID for checkAuth to set when the login match the users database.
 let cookieID;
+// Check for existing user in the users database and return to true if found.
 const checkUser = (email) => {
   for (const user in users) {
     if (email === users[user].email) {
@@ -53,6 +55,7 @@ const checkUser = (email) => {
   }
   return false;
 };
+// Check both user and password, if match on post return to true.
 const checkAuth = (email, pass) => {
   for (const user in users) {
     if (email === users[user].email && pass === users[user].password) {
@@ -71,7 +74,18 @@ const checkHttp = (url) => {
   return url;
 };
 
-// Redirect localhost to /urls page.
+// Check for existing short URL id
+const checkURL = (url) => {
+  for (const id in urlDatabase) {
+    console.log(id)
+    if (url === id) {
+      return true;
+    }
+  }
+  return false;
+};
+
+// GET Redirect localhost to /urls page.
 app.get("/", (req, res) => {
   res.redirect("/urls/");
 });
@@ -148,8 +162,12 @@ app.get("/urls/:id", (req, res) => {
 });
 
 app.get("/u/:id", (req, res) => {
-  const longURL = urlDatabase[req.params.id];
-  res.redirect(longURL);
+  if (checkURL(req.params.id)) {
+    const longURL = urlDatabase[req.params.id];
+    res.redirect(longURL);
+  } else {
+    res.status(404).send(url404);
+  }
 });
 
 
@@ -158,10 +176,15 @@ app.get("/u/:id", (req, res) => {
  */
 // Create new key for new URL
 app.post("/urls", (req, res) => {
-  const id = generateRandomString(6); // Call function to generate random 6 characters
-  const url = req.body.longURL;
-  urlDatabase[id] = checkHttp(url);
-  res.redirect(`/urls/${id}`);
+  if (!req.cookies.user_id) {
+    // Protect from malicious uses.
+    res.send("Login Required!\n");
+  } else {
+    const id = generateRandomString(6); // Call function to generate random 6 characters
+    const url = req.body.longURL;
+    urlDatabase[id] = checkHttp(url);
+    res.redirect(`/urls/${id}`);
+  }
 });
 
 // Update existing URL
