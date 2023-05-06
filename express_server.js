@@ -7,6 +7,25 @@ app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
 app.set("view engine", "ejs");
 
+// Internal databases for this project
+const urlDatabase = {
+  "b2xVn2": "http://www.lighthouselabs.ca",
+  "9sm5xK": "http://www.google.com"
+};
+
+const users = {
+  test: {
+    id:       "test",
+    email:    "test@example.com",
+    password: "my-password"
+  },
+  test2: {
+    id:       "test2",
+    email:    "test2@example.com",
+    password: "my-password2"
+  }
+};
+
 // Define App Messages
 const emailBlank = 'Please enter your email.';
 const emailConflict = 'Email already exist!';
@@ -24,6 +43,26 @@ const generateRandomString = (charNum) => {
   return result;
 };
 
+// Check for existing user and set cookieID
+let cookieID;
+const checkUser = (email) => {
+  for (const user in users) {
+    if (email === users[user].email) {
+      return true;
+    }
+  }
+  return false;
+};
+const checkAuth = (email, pass) => {
+  for (const user in users) {
+    if (email === users[user].email && pass === users[user].password) {
+      cookieID = users[user].id;
+      return true;
+    }
+  }
+  return false;
+};
+
 // Check Input URL to includes HTTPS://
 const checkHttp = (url) => {
   if (!url.startsWith("https://") && !url.startsWith("http://")) {
@@ -32,29 +71,12 @@ const checkHttp = (url) => {
   return url;
 };
 
-/* Databases
- */
-const urlDatabase = {
-  "b2xVn2": "http://www.lighthouselabs.ca",
-  "9sm5xK": "http://www.google.com"
-};
-
-const users = {
-  test: {
-    id:       "test",
-    email:    "test@example.com",
-    password: "my-password"
-  }
-};
-
-/* Redirect localhost to /urls page.
- */
+// Redirect localhost to /urls page.
 app.get("/", (req, res) => {
   res.redirect("/urls/");
 });
 
-/* Display Test Data
- */
+// Display Test Data
 app.get("/data.json", (req, res) => {
   const data = {
     urlDatabase,
@@ -103,11 +125,16 @@ app.get("/login", (req, res) => {
 });
 
 app.get("/urls/new", (req, res) => {
-  const templateVars = {
-    cookieId: req.cookies.user_id,
-    user: users[req.cookies.user_id]
-  };
-  res.render("urls_new", templateVars);
+  if (!req.cookies.user_id) {
+    // If user already logged in, redirect to /urls/
+    res.redirect("/login");
+  } else {
+    const templateVars = {
+      cookieId: req.cookies.user_id,
+      user: users[req.cookies.user_id]
+    };
+    res.render("urls_new", templateVars);
+  }
 });
 
 app.get("/urls/:id", (req, res) => {
@@ -155,49 +182,44 @@ app.post("/urls/:id/delete", (req, res) => {
 app.post("/register", (req, res) => {
   const id = generateRandomString(6);
   const { email, password } = req.body;
+  const user = checkUser(email);
 
   if (!email) {
     res.status(400).send(emailBlank);
   } else if (!password) {
     res.status(400).send(passBlank);
+  } else if (user) {
+    res.status(400).send(emailConflict);
   } else {
-    for (const user in users) {
-      if (email === users[user].email) {
-        res.status(400).send(emailConflict);
-      } else {
-        users[id] = {
-          id,
-          email,
-          password
-        };
-        res.cookie("user_id", users[user].id);
-        res.redirect("/urls");
-      }
-    }
+    users[id] = {
+      id,
+      email,
+      password
+    };
+    res.cookie("user_id", users[id].id);
+    res.redirect("/urls");
   }
 });
 
 // Login
 app.post("/login", (req, res) => {
   const { email, password } = req.body;
+  const user = checkUser(email);
+  const auth = checkAuth(email, password);
 
   if (!email) {
     res.status(403).send(emailBlank);
   } else if (!password) {
     res.status(403).send(passBlank);
-  } else {
-    for (const user in users) {
-      if (email === users[user].email) {
-        if (password === users[user].password) {
-          res.cookie("user_id", users[user].id);
-          res.redirect("/urls");
-        } else {
-          res.status(403).send(passError);
-        }
-      } else {
-        res.status(403).send(emailNotFound);
-      }
+  } else if (user) {
+    if (auth) {
+      res.cookie("user_id", cookieID);
+      res.redirect("/urls");
+    } else {
+      res.status(403).send(passError);
     }
+  } else {
+    res.status(403).send(emailNotFound);
   }
 });
 
