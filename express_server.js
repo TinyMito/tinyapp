@@ -174,9 +174,9 @@ app.post("/login", (req, res) => {
   const password = req.body.password;
 
   if (!email) {
-    res.status(400).send(emailBlank);
+    res.status(403).send(emailBlank);
   } else if (!password) {
-    res.status(400).send(passBlank);
+    res.status(403).send(passBlank);
   } else {
     for (const user in users) {
       if (email === users[user].email) {
