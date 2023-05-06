@@ -154,8 +154,7 @@ app.post("/urls/:id/delete", (req, res) => {
 // Register
 app.post("/register", (req, res) => {
   const id = generateRandomString(6);
-  const email = req.body.email;
-  const password = req.body.password;
+  const { email, password } = req.body;
 
   if (!email) {
     res.status(400).send(emailBlank);
@@ -180,8 +179,7 @@ app.post("/register", (req, res) => {
 
 // Login
 app.post("/login", (req, res) => {
-  const email = req.body.email;
-  const password = req.body.password;
+  const { email, password } = req.body;
 
   if (!email) {
     res.status(403).send(emailBlank);
