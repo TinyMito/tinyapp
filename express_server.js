@@ -7,7 +7,7 @@ const PORT = 8080; // default port 8080
 
 app.use(cookieSession({
   name: 'session',
-  keys: ['fj3#jf3(jfa#(#*7@7','hiadai2892@DDH82','D&@&dahdik2HQ*I@&DH'],
+  keys: ['fj3#jf3(jfa#(#*7@7', 'hiadai2892@DDH82', 'D&@&dahdik2HQ*I@&DH'],
 
   // Cookie Options
   maxAge: 24 * 60 * 60 * 1000 // 24 hours
@@ -33,18 +33,18 @@ const urlDatabase = {
 
 const users = {
   aJ48lW: {
-    id:       "aJ48lW",
-    email:    "123@example.com",
+    id: "aJ48lW",
+    email: "123@example.com",
     password: "$2a$10$Ez8ugewmBaLv7cgL1ktNR.swYD4PjVWy1MAvqspdhSd/6L4SJE/hq" // 123123
   },
   k255h2: {
-    id:       "k255h2",
-    email:    "789@example.com",
+    id: "k255h2",
+    email: "789@example.com",
     password: "$2a$10$5T7.e/u5dfIjgSwu/LQpAuHrWU6OQ33m6KHjQr9sLfZFKJ7yx1G96" // 789789
   }
 };
 
-// Define App Messages
+// Define Error Messages
 const emailBlank = 'Please enter your email.';
 const emailConflict = 'Email already exist!';
 const emailNotFound = 'Email does not exist.';
@@ -54,7 +54,7 @@ const url404 = 'URL Not Found Invalid ID.';
 const wrongUser = 'Permission denied to edit this URL: wrong user.';
 const wrongPerm = 'Permission denied to edit this URL: please login.';
 
-// Generate Random String
+// Generate Random String for the user ID and URL ID.
 const generateRandomString = (charNum) => {
   const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
   let result = '';
@@ -115,7 +115,7 @@ app.get("/", (req, res) => {
   res.redirect("/urls/");
 });
 
-// Display Test Data
+// GET Display JSON Data
 app.get("/data.json", (req, res) => {
   const data = {
     urlDatabase,
@@ -125,18 +125,23 @@ app.get("/data.json", (req, res) => {
   res.send(JSON.stringify(data, null, 2));
 });
 
-/* GET
- * Pass variables to EJS template
- */
+// GET Primary URL listing
 app.get("/urls", (req, res) => {
-  const templateVars = {
-    cookieId: req.session.userId,
-    user: users[req.session.userId],
-    urls: urlsForUser(req.session.userId)
-  };
-  res.render("urls_index", templateVars);
+  if (users[req.session.userId] === undefined) {
+    // Clear orphan cookie session due to server reset, invalid session or missing user in database.
+    req.session = null;
+    res.redirect("/login");
+  } else {
+    const templateVars = {
+      cookieId: req.session.userId,
+      user: users[req.session.userId],
+      urls: urlsForUser(req.session.userId)
+    };
+    res.render("urls_index", templateVars);  
+  }
 });
 
+// GET Registration Page
 app.get("/register", (req, res) => {
   if (req.session.userId) {
     // If user already logged in, redirect to /urls/
@@ -150,6 +155,7 @@ app.get("/register", (req, res) => {
   }
 });
 
+// GET Login Page
 app.get("/login", (req, res) => {
   if (req.session.userId) {
     res.redirect("/urls/");
@@ -162,6 +168,7 @@ app.get("/login", (req, res) => {
   }
 });
 
+// GET New URL Creation Page
 app.get("/urls/new", (req, res) => {
   if (!req.session.userId) {
     res.redirect("/login");
@@ -174,6 +181,7 @@ app.get("/urls/new", (req, res) => {
   }
 });
 
+// GET show selected URL Page
 app.get("/urls/:id", (req, res) => {
   if (checkURL(req.params.id)) {
     if (!req.session.userId) {
@@ -194,6 +202,7 @@ app.get("/urls/:id", (req, res) => {
   }
 });
 
+// GET Redirect to longURL website
 app.get("/u/:id", (req, res) => {
   // We have to check if the URL exists in the database.
   if (checkURL(req.params.id)) {
@@ -204,8 +213,7 @@ app.get("/u/:id", (req, res) => {
   }
 });
 
-// POST
-// Create new key for new URL
+// POST Create new key for new URL
 app.post("/urls", (req, res) => {
   if (!req.session.userId) {
     // Protect from malicious uses.
@@ -221,7 +229,7 @@ app.post("/urls", (req, res) => {
   }
 });
 
-// Update existing URL
+// POST Update existing URL
 app.post("/urls/:id", (req, res) => {
   // We need to check if the URL exists, check if the user logged in, check if it is correct logged in user before actioning Delete.
   if (checkURL(req.params.id)) {
@@ -243,7 +251,7 @@ app.post("/urls/:id", (req, res) => {
   }
 });
 
-// Delete URL
+// POST Delete URL entry
 app.post("/urls/:id/delete", (req, res) => {
   // We need to check if the URL exists, check if the user logged in, check if it is correct logged in user before actioning Delete.
   if (checkURL(req.params.id)) {
@@ -260,7 +268,7 @@ app.post("/urls/:id/delete", (req, res) => {
   }
 });
 
-// Register
+// Register new user, additional check if user email exist already.
 app.post("/register", (req, res) => {
   const id = generateRandomString(6);
   const { email, password } = req.body;
@@ -283,7 +291,7 @@ app.post("/register", (req, res) => {
   }
 });
 
-// Login
+// Login to existing user, also check if user email exist or not.
 app.post("/login", (req, res) => {
   const { email, password } = req.body;
   const user = getUserByEmail(email, users);
@@ -305,7 +313,7 @@ app.post("/login", (req, res) => {
   }
 });
 
-// Logout
+// Logout and clear all cookie session.
 app.post("/logout", (req, res) => {
   req.session = null;
   res.redirect("/login");
