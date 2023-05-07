@@ -5,13 +5,13 @@ https://www.lighthouselabs.ca → http://goo.gl/6alQXu
 
 ## Features
 List of all the generated shorten URL and you can edit the URL anytime or delete the URL.
-!["Screenshot 1"](img/20230505_000417.png)
+!["Screenshot 1"](docs/url_listing.png)
 
 To create the URL simply just type the long URL into the input box and hit Submit button.
-!["Screenshot 1"](img/20230505_000418.png)
+!["Screenshot 1"](docs/url_new.png)
 
 This is the result after the URL is shorten and you can edit the URL for correction.
-!["Screenshot 1"](img/20230505_000419.png)
+!["Screenshot 1"](docs/url_edit.png)
 
 ## Dependencies
 
