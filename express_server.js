@@ -1,6 +1,7 @@
 const express = require("express");
 const cookieSession = require('cookie-session');
 const bcrypt = require("bcryptjs");
+const getUserByEmail = require("./helpers");
 const app = express();
 const PORT = 8080; // default port 8080
 
@@ -273,13 +274,14 @@ app.post("/urls/:id/delete", (req, res) => {
 app.post("/register", (req, res) => {
   const id = generateRandomString(6);
   const { email, password } = req.body;
-  const user = checkUser(email);
+  //const user = checkUser(email);
+  const user = getUserByEmail(email, users);
 
   if (!email) {
     res.status(400).send(emailBlank);
   } else if (!password) {
     res.status(400).send(passBlank);
-  } else if (user) {
+  } else if (user[0]) {
     res.status(400).send(emailConflict);
   } else {
     users[id] = {
@@ -292,17 +294,20 @@ app.post("/register", (req, res) => {
   }
 });
 
+console.log(getUserByEmail('123124@me.com', users));
+
 // Login
 app.post("/login", (req, res) => {
   const { email, password } = req.body;
-  const user = checkUser(email);
+  //const user = checkUser(email);
+  const user = getUserByEmail(email, users);
   const auth = checkAuth(email, password);
 
   if (!email) {
     res.status(403).send(emailBlank);
   } else if (!password) {
     res.status(403).send(passBlank);
-  } else if (user) {
+  } else if (user[0]) {
     if (auth) {
       req.session.user_id = cookieID;
       res.redirect("/urls");
