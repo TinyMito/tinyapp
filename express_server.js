@@ -127,18 +127,18 @@ app.get("/data.json", (req, res) => {
 
 // GET Primary URL listing
 app.get("/urls", (req, res) => {
-  if (users[req.session.userId] === undefined) {
+/*   if (users[req.session.userId] === undefined) {
     // Clear orphan cookie session due to server reset, invalid session or missing user in database.
     req.session = null;
-    res.redirect("/login");
-  } else {
+    res.redirect("/");
+  } else { */
     const templateVars = {
       cookieId: req.session.userId,
       user: users[req.session.userId],
       urls: urlsForUser(req.session.userId)
     };
     res.render("urls_index", templateVars);
-  }
+  //}
 });
 
 // GET Registration Page
