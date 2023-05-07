@@ -1,5 +1,6 @@
 const express = require("express");
 const cookieParser = require('cookie-parser');
+const bcrypt = require("bcryptjs");
 const app = express();
 const PORT = 8080; // default port 8080
 
@@ -27,12 +28,12 @@ const users = {
   aJ48lW: {
     id:       "aJ48lW",
     email:    "123@example.com",
-    password: "123123"
+    password: "$2a$10$Ez8ugewmBaLv7cgL1ktNR.swYD4PjVWy1MAvqspdhSd/6L4SJE/hq" // 123123
   },
   k255h2: {
     id:       "k255h2",
     email:    "789@example.com",
-    password: "789789"
+    password: "$2a$10$5T7.e/u5dfIjgSwu/LQpAuHrWU6OQ33m6KHjQr9sLfZFKJ7yx1G96" // 789789
   }
 };
 
@@ -71,7 +72,7 @@ const checkUser = (email) => {
 // Check both user and password, if match on post return to true.
 const checkAuth = (email, pass) => {
   for (const user in users) {
-    if (email === users[user].email && pass === users[user].password) {
+    if (email === users[user].email && bcrypt.compareSync(pass, users[user].password)) {
       cookieID = users[user].id;
       return true;
     }
@@ -278,7 +279,7 @@ app.post("/register", (req, res) => {
     users[id] = {
       id,
       email,
-      password
+      password: bcrypt.hashSync(password, 10)
     };
     res.cookie("user_id", users[id].id);
     res.redirect("/urls");
