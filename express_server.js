@@ -43,6 +43,8 @@ const emailNotFound = 'Email does not exist.';
 const passBlank = 'Please enter a password.';
 const passError = 'Password is incorrect.';
 const url404 = 'URL Not Found Invalid ID.';
+const wrongUser = 'Permission denied to edit this URL: wrong user.';
+const wrongPerm = 'Permission denied to edit this URL: please login.';
 
 // Generate Random String
 const generateRandomString = (charNum) => {
@@ -65,6 +67,7 @@ const checkUser = (email) => {
   }
   return false;
 };
+
 // Check both user and password, if match on post return to true.
 const checkAuth = (email, pass) => {
   for (const user in users) {
@@ -95,6 +98,20 @@ const checkURL = (url) => {
   return false;
 };
 
+// Only list url for the logged in user
+const urlsForUser = (id) => {
+  let userURL = {};
+  for (const url in urlDatabase) {
+    if (id === urlDatabase[url].userID) {
+      userURL[url] = {
+        longURL: urlDatabase[url].longURL,
+        userID: urlDatabase[url].userID
+      }
+    }
+  }
+  return userURL;
+};
+
 // GET Redirect localhost to /urls page.
 app.get("/", (req, res) => {
   res.redirect("/urls/");
@@ -117,7 +134,7 @@ app.get("/urls", (req, res) => {
   const templateVars = {
     cookieId: req.cookies.user_id,
     user: users[req.cookies.user_id],
-    urls: urlDatabase
+    urls: urlsForUser(req.cookies.user_id)
   };
   res.render("urls_index", templateVars);
 });
@@ -137,7 +154,6 @@ app.get("/register", (req, res) => {
 
 app.get("/login", (req, res) => {
   if (req.cookies.user_id) {
-    // If user already logged in, redirect to /urls/
     res.redirect("/urls/");
   } else {
     const templateVars = {
@@ -150,7 +166,6 @@ app.get("/login", (req, res) => {
 
 app.get("/urls/new", (req, res) => {
   if (!req.cookies.user_id) {
-    // If user already logged in, redirect to /urls/
     res.redirect("/login");
   } else {
     const templateVars = {
@@ -162,13 +177,23 @@ app.get("/urls/new", (req, res) => {
 });
 
 app.get("/urls/:id", (req, res) => {
-  const templateVars = {
-    cookieId: req.cookies.user_id,
-    user: users[req.cookies.user_id],
-    id: req.params.id,
-    longURL: urlDatabase[req.params.id].longURL
-  };
-  res.render("urls_show", templateVars);
+  if (checkURL(req.params.id)) {
+    if (!req.cookies.user_id) {
+      res.status(403).send(wrongPerm);
+    } else if (req.cookies.user_id !== urlDatabase[req.params.id].userID) {
+      res.status(403).send(wrongUser);
+    } else {
+      const templateVars = {
+        cookieId: req.cookies.user_id,
+        user: users[req.cookies.user_id],
+        id: req.params.id,
+        longURL: urlDatabase[req.params.id].longURL
+      };
+      res.render("urls_show", templateVars);
+    }
+  } else {
+    res.redirect("/urls/");
+  }
 });
 
 app.get("/u/:id", (req, res) => {
@@ -210,8 +235,18 @@ app.post("/urls/:id", (req, res) => {
 
 // Delete URL
 app.post("/urls/:id/delete", (req, res) => {
-  delete urlDatabase[req.params.id];
-  res.redirect("/urls");
+  if (checkURL(req.params.id)) {
+    if (!req.cookies.user_id) {
+      res.status(403).send(wrongPerm);
+    } else if (req.cookies.user_id !== urlDatabase[req.params.id].userID) {
+      res.status(403).send(wrongUser);
+    } else {
+      delete urlDatabase[req.params.id];
+      res.redirect("/urls");
+    }
+  } else {
+    res.status(403).send(url404);
+  }
 });
 
 // Register
