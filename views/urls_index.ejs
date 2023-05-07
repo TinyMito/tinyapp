@@ -19,6 +19,7 @@
   <body>
     <%- include('partials/_header') %>
     <main style="margin: 1em;">
+      <% if (cookieId) { %>
       <h3>My URLs</h3>
       <table class="table">
         <thead>
@@ -33,13 +34,19 @@
           <% for (let id in urls) { %>
             <tr>
               <td><a target="_blank" href="/u/<%= id %>"><%= id %></a></td>
-              <td><%= urls[id] %></td>
+              <td><%= urls[id].longURL %></td>
               <td><form method="GET" action="/urls/<%= id %>"><button type="submit" class="btn btn-outline-primary">Edit</button></form></td>
               <td><form method="POST" action="/urls/<%= id %>/delete"><button type="submit" class="btn btn-outline-danger">Delete</button></form></td>
             </tr>
           <% } %>
         </tbody>
       </table>
+      <% } else { %>
+        <div class="text-center">
+        <h3>Welcome to TinyApp!</h3>
+        <div class="card-header">A user acccount required to use TinyApp shortener service, if you have an user account. Please click the login button at the top right. If not please register a new account.</div>
+        </div>
+      <% } %>
     </main>
     <!-- Bootstrap JS -->
     <script

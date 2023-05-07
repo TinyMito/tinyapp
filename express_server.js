@@ -9,20 +9,30 @@ app.set("view engine", "ejs");
 
 // Internal databases for this project
 const urlDatabase = {
-  "b2xVn2": "http://www.lighthouselabs.ca",
-  "9sm5xK": "http://www.google.com"
+  b6UTxQ: {
+    longURL: "https://www.tsn.ca",
+    userID: "aJ48lW",
+  },
+  i3BoGr: {
+    longURL: "https://www.google.ca",
+    userID: "aJ48lW",
+  },
+  k29d22: {
+    longURL: "https://www.reddit.com",
+    userID: "k255h2",
+  }
 };
 
 const users = {
-  test: {
-    id:       "test",
-    email:    "test@example.com",
-    password: "my-password"
+  aJ48lW: {
+    id:       "aJ48lW",
+    email:    "123@example.com",
+    password: "123123"
   },
-  test2: {
-    id:       "test2",
-    email:    "test2@example.com",
-    password: "my-password2"
+  k255h2: {
+    id:       "k255h2",
+    email:    "789@example.com",
+    password: "789789"
   }
 };
 
@@ -156,24 +166,21 @@ app.get("/urls/:id", (req, res) => {
     cookieId: req.cookies.user_id,
     user: users[req.cookies.user_id],
     id: req.params.id,
-    longURL: urlDatabase[req.params.id]
+    longURL: urlDatabase[req.params.id].longURL
   };
   res.render("urls_show", templateVars);
 });
 
 app.get("/u/:id", (req, res) => {
   if (checkURL(req.params.id)) {
-    const longURL = urlDatabase[req.params.id];
+    const longURL = urlDatabase[req.params.id].longURL;
     res.redirect(longURL);
   } else {
     res.status(404).send(url404);
   }
 });
 
-
-/* POST
- * Request Submitted Data
- */
+// POST
 // Create new key for new URL
 app.post("/urls", (req, res) => {
   if (!req.cookies.user_id) {
@@ -182,7 +189,10 @@ app.post("/urls", (req, res) => {
   } else {
     const id = generateRandomString(6); // Call function to generate random 6 characters
     const url = req.body.longURL;
-    urlDatabase[id] = checkHttp(url);
+    urlDatabase[id] = {
+      longURL: checkHttp(url),
+      userID: req.cookies.user_id
+    }
     res.redirect(`/urls/${id}`);
   }
 });
@@ -191,7 +201,10 @@ app.post("/urls", (req, res) => {
 app.post("/urls/:id", (req, res) => {
   const id = req.params.id;
   const url = req.body.longURL;
-  urlDatabase[id] = checkHttp(url);
+  urlDatabase[id] = {
+    longURL: checkHttp(url),
+    userID: req.cookies.user_id
+  }
   res.redirect("/urls/");
 });
 
