@@ -1,5 +1,5 @@
 const express = require("express");
-const getUserByEmail = require("./helpers");
+const { getUserByEmail } = require("./helpers");
 const cookieSession = require('cookie-session');
 const bcrypt = require("bcryptjs");
 const app = express();
@@ -11,7 +11,7 @@ app.use(cookieSession({
 
   // Cookie Options
   maxAge: 24 * 60 * 60 * 1000 // 24 hours
-}))
+}));
 app.use(express.urlencoded({ extended: true }));
 app.set("view engine", "ejs");
 
@@ -98,7 +98,7 @@ const checkHttp = (url) => {
 // Check for existing short URL id
 const checkURL = (url) => {
   for (const id in urlDatabase) {
-    console.log(id)
+    console.log(id);
     if (url === id) {
       return true;
     }
@@ -114,7 +114,7 @@ const urlsForUser = (id) => {
       userURL[url] = {
         longURL: urlDatabase[url].longURL,
         userID: urlDatabase[url].userID
-      }
+      };
     }
   }
   return userURL;
@@ -226,7 +226,7 @@ app.post("/urls", (req, res) => {
     urlDatabase[id] = {
       longURL: checkHttp(url),
       userID: req.session.user_id
-    }
+    };
     res.redirect(`/urls/${id}`);
   }
 });
@@ -245,7 +245,7 @@ app.post("/urls/:id", (req, res) => {
       urlDatabase[id] = {
         longURL: checkHttp(url),
         userID: req.session.user_id
-      }
+      };
       res.redirect("/urls/");
     }
   } else {

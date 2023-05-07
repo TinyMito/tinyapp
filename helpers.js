@@ -1,6 +1,6 @@
 const getUserByEmail = function(email, database) {
   let data = database;
-  let user = [];
+  let user;
   for (const obj in data) {
     if (email === data[obj].email) {
       user = data[obj].id;
@@ -9,4 +9,4 @@ const getUserByEmail = function(email, database) {
   return user;
 };
 
-module.exports = getUserByEmail;
+module.exports = { getUserByEmail };
