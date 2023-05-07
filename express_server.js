@@ -6,7 +6,7 @@ const PORT = 8080; // default port 8080
 
 app.use(cookieSession({
   name: 'session',
-  keys: ['112d2d1dd23d3'],
+  keys: ['fj3#jf3(jfa#(#*7@7','hiadai2892@DDH82','D&@&dahdik2HQ*I@&DH'],
 
   // Cookie Options
   maxAge: 24 * 60 * 60 * 1000 // 24 hours
@@ -316,7 +316,7 @@ app.post("/login", (req, res) => {
 
 // Logout
 app.post("/logout", (req, res) => {
-  req.session.user_id = null;
+  req.session = null;
   res.redirect("/login");
 });
 
