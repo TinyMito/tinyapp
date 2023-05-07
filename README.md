@@ -13,7 +13,16 @@ To create the URL simply just type the long URL into the input box and hit Submi
 This is the result after the URL is shorten and you can edit the URL for correction.
 !["Screenshot 1"](img/20230505_000419.png)
 
+## Dependencies
+
+- Node.js
+- Express
+- EJS
+- bcryptjs
+- cookie-session
+
 ## How to use
 1. After cloning this repo.
-2. Run `npm start` in the terminal.
+2. Run `npm install` to intall the app.
+2. Run `npm start` to run the app.
 3. Go to your browser and enter 'http://localhost:8080'
