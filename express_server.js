@@ -197,6 +197,7 @@ app.get("/urls/:id", (req, res) => {
 });
 
 app.get("/u/:id", (req, res) => {
+  // We have to check if the URL exists in the database.
   if (checkURL(req.params.id)) {
     const longURL = urlDatabase[req.params.id].longURL;
     res.redirect(longURL);
@@ -224,17 +225,29 @@ app.post("/urls", (req, res) => {
 
 // Update existing URL
 app.post("/urls/:id", (req, res) => {
-  const id = req.params.id;
-  const url = req.body.longURL;
-  urlDatabase[id] = {
-    longURL: checkHttp(url),
-    userID: req.cookies.user_id
+  // We need to check if the URL exists, check if the user logged in, check if it is correct logged in user before actioning Delete.
+  if (checkURL(req.params.id)) {
+    if (!req.cookies.user_id) {
+      res.status(403).send(wrongPerm);
+    } else if (req.cookies.user_id !== urlDatabase[req.params.id].userID) {
+      res.status(403).send(wrongUser);
+    } else {
+      const id = req.params.id;
+      const url = req.body.longURL;
+      urlDatabase[id] = {
+        longURL: checkHttp(url),
+        userID: req.cookies.user_id
+      }
+      res.redirect("/urls/");
+    }
+  } else {
+    res.status(403).send(url404);
   }
-  res.redirect("/urls/");
 });
 
 // Delete URL
 app.post("/urls/:id/delete", (req, res) => {
+  // We need to check if the URL exists, check if the user logged in, check if it is correct logged in user before actioning Delete.
   if (checkURL(req.params.id)) {
     if (!req.cookies.user_id) {
       res.status(403).send(wrongPerm);
