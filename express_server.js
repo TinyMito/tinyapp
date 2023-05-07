@@ -1,7 +1,7 @@
 const express = require("express");
+const getUserByEmail = require("./helpers");
 const cookieSession = require('cookie-session');
 const bcrypt = require("bcryptjs");
-const getUserByEmail = require("./helpers");
 const app = express();
 const PORT = 8080; // default port 8080
 
@@ -274,7 +274,6 @@ app.post("/urls/:id/delete", (req, res) => {
 app.post("/register", (req, res) => {
   const id = generateRandomString(6);
   const { email, password } = req.body;
-  //const user = checkUser(email);
   const user = getUserByEmail(email, users);
 
   if (!email) {
@@ -299,7 +298,6 @@ console.log(getUserByEmail('123124@me.com', users));
 // Login
 app.post("/login", (req, res) => {
   const { email, password } = req.body;
-  //const user = checkUser(email);
   const user = getUserByEmail(email, users);
   const auth = checkAuth(email, password);
 
