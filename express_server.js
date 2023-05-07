@@ -137,7 +137,7 @@ app.get("/urls", (req, res) => {
       user: users[req.session.userId],
       urls: urlsForUser(req.session.userId)
     };
-    res.render("urls_index", templateVars);  
+    res.render("urls_index", templateVars);
   }
 });
 
