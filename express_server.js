@@ -1,10 +1,16 @@
 const express = require("express");
-const cookieParser = require('cookie-parser');
+const cookieSession = require('cookie-session');
 const bcrypt = require("bcryptjs");
 const app = express();
 const PORT = 8080; // default port 8080
 
-app.use(cookieParser());
+app.use(cookieSession({
+  name: 'session',
+  keys: ['112d2d1dd23d3'],
+
+  // Cookie Options
+  maxAge: 24 * 60 * 60 * 1000 // 24 hours
+}))
 app.use(express.urlencoded({ extended: true }));
 app.set("view engine", "ejs");
 
@@ -133,45 +139,45 @@ app.get("/data.json", (req, res) => {
  */
 app.get("/urls", (req, res) => {
   const templateVars = {
-    cookieId: req.cookies.user_id,
-    user: users[req.cookies.user_id],
-    urls: urlsForUser(req.cookies.user_id)
+    cookieId: req.session.user_id,
+    user: users[req.session.user_id],
+    urls: urlsForUser(req.session.user_id)
   };
   res.render("urls_index", templateVars);
 });
 
 app.get("/register", (req, res) => {
-  if (req.cookies.user_id) {
+  if (req.session.user_id) {
     // If user already logged in, redirect to /urls/
     res.redirect("/urls/");
   } else {
     const templateVars = {
-      cookieId: req.cookies.user_id,
-      user: users[req.cookies.user_id]
+      cookieId: req.session.user_id,
+      user: users[req.session.user_id]
     };
     res.render("urls_register", templateVars);
   }
 });
 
 app.get("/login", (req, res) => {
-  if (req.cookies.user_id) {
+  if (req.session.user_id) {
     res.redirect("/urls/");
   } else {
     const templateVars = {
-      cookieId: req.cookies.user_id,
-      user: users[req.cookies.user_id]
+      cookieId: req.session.user_id,
+      user: users[req.session.user_id]
     };
     res.render("urls_login", templateVars);
   }
 });
 
 app.get("/urls/new", (req, res) => {
-  if (!req.cookies.user_id) {
+  if (!req.session.user_id) {
     res.redirect("/login");
   } else {
     const templateVars = {
-      cookieId: req.cookies.user_id,
-      user: users[req.cookies.user_id]
+      cookieId: req.session.user_id,
+      user: users[req.session.user_id]
     };
     res.render("urls_new", templateVars);
   }
@@ -179,14 +185,14 @@ app.get("/urls/new", (req, res) => {
 
 app.get("/urls/:id", (req, res) => {
   if (checkURL(req.params.id)) {
-    if (!req.cookies.user_id) {
+    if (!req.session.user_id) {
       res.status(403).send(wrongPerm);
-    } else if (req.cookies.user_id !== urlDatabase[req.params.id].userID) {
+    } else if (req.session.user_id !== urlDatabase[req.params.id].userID) {
       res.status(403).send(wrongUser);
     } else {
       const templateVars = {
-        cookieId: req.cookies.user_id,
-        user: users[req.cookies.user_id],
+        cookieId: req.session.user_id,
+        user: users[req.session.user_id],
         id: req.params.id,
         longURL: urlDatabase[req.params.id].longURL
       };
@@ -210,7 +216,7 @@ app.get("/u/:id", (req, res) => {
 // POST
 // Create new key for new URL
 app.post("/urls", (req, res) => {
-  if (!req.cookies.user_id) {
+  if (!req.session.user_id) {
     // Protect from malicious uses.
     res.send("Login Required!\n");
   } else {
@@ -218,7 +224,7 @@ app.post("/urls", (req, res) => {
     const url = req.body.longURL;
     urlDatabase[id] = {
       longURL: checkHttp(url),
-      userID: req.cookies.user_id
+      userID: req.session.user_id
     }
     res.redirect(`/urls/${id}`);
   }
@@ -228,16 +234,16 @@ app.post("/urls", (req, res) => {
 app.post("/urls/:id", (req, res) => {
   // We need to check if the URL exists, check if the user logged in, check if it is correct logged in user before actioning Delete.
   if (checkURL(req.params.id)) {
-    if (!req.cookies.user_id) {
+    if (!req.session.user_id) {
       res.status(403).send(wrongPerm);
-    } else if (req.cookies.user_id !== urlDatabase[req.params.id].userID) {
+    } else if (req.session.user_id !== urlDatabase[req.params.id].userID) {
       res.status(403).send(wrongUser);
     } else {
       const id = req.params.id;
       const url = req.body.longURL;
       urlDatabase[id] = {
         longURL: checkHttp(url),
-        userID: req.cookies.user_id
+        userID: req.session.user_id
       }
       res.redirect("/urls/");
     }
@@ -250,9 +256,9 @@ app.post("/urls/:id", (req, res) => {
 app.post("/urls/:id/delete", (req, res) => {
   // We need to check if the URL exists, check if the user logged in, check if it is correct logged in user before actioning Delete.
   if (checkURL(req.params.id)) {
-    if (!req.cookies.user_id) {
+    if (!req.session.user_id) {
       res.status(403).send(wrongPerm);
-    } else if (req.cookies.user_id !== urlDatabase[req.params.id].userID) {
+    } else if (req.session.user_id !== urlDatabase[req.params.id].userID) {
       res.status(403).send(wrongUser);
     } else {
       delete urlDatabase[req.params.id];
@@ -298,7 +304,7 @@ app.post("/login", (req, res) => {
     res.status(403).send(passBlank);
   } else if (user) {
     if (auth) {
-      res.cookie("user_id", cookieID);
+      req.session.user_id = cookieID;
       res.redirect("/urls");
     } else {
       res.status(403).send(passError);
@@ -310,7 +316,7 @@ app.post("/login", (req, res) => {
 
 // Logout
 app.post("/logout", (req, res) => {
-  res.clearCookie("user_id");
+  req.session.user_id = null;
   res.redirect("/login");
 });
 
